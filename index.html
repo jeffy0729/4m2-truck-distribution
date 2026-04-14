@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>4米2轻卡城配业务分布图</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --bg-main: #0D1117;
@@ -117,64 +119,72 @@
             content: '🗺️';
         }
         
-        .map-container {
-            background: #0a0e14;
+        #map {
+            height: 500px;
             border-radius: 8px;
-            height: 400px;
+            z-index: 1;
+        }
+        
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        
+        .legend-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .map-placeholder {
-            text-align: center;
-            color: var(--text-sub);
-        }
-        
-        .city-markers {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .city-marker {
-            background: var(--bg-card);
-            border: 2px solid var(--accent);
-            border-radius: 8px;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 120px;
-            text-align: center;
-        }
-        
-        .city-marker:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(247, 147, 26, 0.3);
-        }
-        
-        .city-marker.top3 {
-            border-color: var(--accent);
-            background: rgba(247, 147, 26, 0.15);
-        }
-        
-        .city-marker.other {
-            border-color: var(--primary);
-            background: rgba(88, 166, 255, 0.15);
-        }
-        
-        .city-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        
-        .city-count {
+            gap: 8px;
             font-size: 14px;
+        }
+        
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+        
+        .legend-dot.orange {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .legend-dot.blue {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        /* Custom Leaflet Popup */
+        .leaflet-popup-content-wrapper {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border-radius: 8px;
+        }
+        
+        .leaflet-popup-tip {
+            background: var(--bg-card);
+        }
+        
+        .popup-content {
+            padding: 8px;
+        }
+        
+        .popup-content h3 {
+            color: var(--accent);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .popup-content p {
             color: var(--text-sub);
+            font-size: 14px;
+            margin: 4px 0;
         }
         
         /* TOP10 Cards */
@@ -242,38 +252,6 @@
         .footer .source {
             color: var(--primary);
         }
-        
-        /* Legend */
-        .legend {
-            display: flex;
-            gap: 24px;
-            justify-content: center;
-            margin-top: 16px;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        
-        .legend-dot.orange {
-            background: var(--accent);
-        }
-        
-        .legend-dot.blue {
-            background: var(--primary);
-        }
     </style>
 </head>
 <body>
@@ -301,49 +279,10 @@
             </div>
         </div>
         
-        <!-- Map Section -->
+        <!-- Real Map Section -->
         <div class="map-section">
             <h2 class="section-title">城市分布地图</h2>
-            <div class="map-container">
-                <div class="city-markers">
-                    <div class="city-marker top3">
-                        <div class="city-name">深圳</div>
-                        <div class="city-count">55,469辆</div>
-                    </div>
-                    <div class="city-marker top3">
-                        <div class="city-name">广州</div>
-                        <div class="city-count">20,000+辆</div>
-                    </div>
-                    <div class="city-marker top3">
-                        <div class="city-name">成都</div>
-                        <div class="city-count">20,000+辆</div>
-                    </div>
-                    <div class="city-marker other">
-                        <div class="city-name">北京</div>
-                        <div class="city-count">10,000+辆</div>
-                    </div>
-                    <div class="city-marker other">
-                        <div class="city-name">郑州</div>
-                        <div class="city-count">10,000+辆</div>
-                    </div>
-                    <div class="city-marker other">
-                        <div class="city-name">昆明</div>
-                        <div class="city-count">10,000+辆</div>
-                    </div>
-                    <div class="city-marker other">
-                        <div class="city-name">天津</div>
-                        <div class="city-count">10,000+辆</div>
-                    </div>
-                    <div class="city-marker other">
-                        <div class="city-name">重庆</div>
-                        <div class="city-count">10,000+辆</div>
-                    </div>
-                    <div class="city-marker other">
-                        <div class="city-name">武汉</div>
-                        <div class="city-count">10,000+辆</div>
-                    </div>
-                </div>
-            </div>
+            <div id="map"></div>
             <div class="legend">
                 <div class="legend-item">
                     <div class="legend-dot orange"></div>
@@ -441,5 +380,66 @@
             <p style="margin-top: 8px;">🦄 由小马佩德罗 & 小马-艺术家 联合出品</p>
         </div>
     </div>
+    
+    <script>
+        // Initialize map centered on China
+        var map = L.map('map', {
+            center: [30, 105],
+            zoom: 4,
+            minZoom: 3,
+            maxZoom: 10,
+            zoomControl: true
+        });
+        
+        // Add dark theme tile layer (CartoDB Dark Matter)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+        
+        // City data with coordinates
+        var cityData = [
+            { name: '深圳', count: '55,469辆', percent: '26%', lat: 22.5431, lng: 114.0579, top3: true },
+            { name: '广州', count: '20,000+辆', percent: '9.4%', lat: 23.1291, lng: 113.2644, top3: true },
+            { name: '成都', count: '20,000+辆', percent: '9.4%', lat: 30.5728, lng: 104.0668, top3: true },
+            { name: '北京', count: '10,000+辆', percent: '4.7%', lat: 39.9042, lng: 116.4074, top3: false },
+            { name: '郑州', count: '10,000+辆', percent: '4.7%', lat: 34.7466, lng: 113.6254, top3: false },
+            { name: '昆明', count: '10,000+辆', percent: '4.7%', lat: 25.0406, lng: 102.7129, top3: false },
+            { name: '天津', count: '10,000+辆', percent: '4.7%', lat: 39.3434, lng: 117.3616, top3: false },
+            { name: '重庆', count: '10,000+辆', percent: '4.7%', lat: 29.4316, lng: 106.9123, top3: false },
+            { name: '武汉', count: '10,000+辆', percent: '4.7%', lat: 30.5928, lng: 114.3055, top3: false }
+        ];
+        
+        // Custom marker icons
+        var orangeIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<div style="width:20px;height:20px;background:#F7931A;border-radius:50%;border:3px solid #fff;box-shadow:0 2px8px rgba(0,0,0,0.3)"></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+        
+        var blueIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<div style="width:16px;height:16px;background:#58A6FF;border-radius:50%;border:2px solid #fff;box-shadow:0 2px6px rgba(0,0,0,0.3)"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+        });
+        
+        // Add markers for each city
+        cityData.forEach(function(city, index) {
+            var icon = city.top3 ? orangeIcon : blueIcon;
+            var marker = L.marker([city.lat, city.lng], { icon: icon }).addTo(map);
+            
+            var popupContent = '<div class="popup-content">' +
+                '<h3>' + city.name + '</h3>' +
+                '<p>保有量: ' + city.count + '</p>' +
+                '<p>占比: ' + city.percent + '</p>' +
+                '<p>排名: #' + (index + 1) + '</p>' +
+                '</div>';
+            
+            marker.bindPopup(popupContent);
+        });
+    </script>
 </body>
 </html>
