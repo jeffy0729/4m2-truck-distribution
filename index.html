@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4米2轻卡城配业务分布图</title>
+    <title>4米2轻卡城配业务分布图 v2.0</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.chinaLayer@1.0.2/dist/leaflet.chinaLayer.js"></script>
     <style>
         :root {
             --bg-main: #0D1117;
@@ -28,7 +29,7 @@
             line-height: 1.6;
         }
         
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1400px; margin: 0 auto; }
         
         /* Banner */
         .banner {
@@ -52,7 +53,7 @@
         }
         
         .banner h1 {
-            font-size: 32px;
+            font-size: 36px;
             margin-bottom: 24px;
             display: flex;
             align-items: center;
@@ -61,6 +62,16 @@
         
         .banner h1 span {
             color: var(--accent);
+        }
+        
+        .version-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 12px;
         }
         
         .metrics {
@@ -83,10 +94,11 @@
         }
         
         .metric-value {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: 700;
             color: var(--primary);
             margin-bottom: 8px;
+            font-family: 'DIN Condensed', 'Arial Black', sans-serif;
         }
         
         .metric-card.accent .metric-value {
@@ -120,7 +132,7 @@
         }
         
         #map {
-            height: 500px;
+            height: 550px;
             border-radius: 8px;
             z-index: 1;
         }
@@ -134,6 +146,7 @@
             padding: 12px;
             background: rgba(0,0,0,0.3);
             border-radius: 8px;
+            flex-wrap: wrap;
         }
         
         .legend-item {
@@ -162,29 +175,39 @@
         
         /* Custom Leaflet Popup */
         .leaflet-popup-content-wrapper {
-            background: var(--bg-card);
-            color: var(--text-main);
+            background: var(--bg-card) !important;
+            color: var(--text-main) !important;
             border-radius: 8px;
+            border: 1px solid var(--border);
         }
         
         .leaflet-popup-tip {
-            background: var(--bg-card);
+            background: var(--bg-card) !important;
         }
         
         .popup-content {
             padding: 8px;
+            min-width: 140px;
         }
         
         .popup-content h3 {
             color: var(--accent);
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
         }
         
         .popup-content p {
             color: var(--text-sub);
-            font-size: 14px;
-            margin: 4px 0;
+            font-size: 13px;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .popup-content p strong {
+            color: var(--primary);
         }
         
         /* TOP10 Cards */
@@ -209,13 +232,15 @@
         .rank-card:hover {
             border-color: var(--primary);
             transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(88, 166, 255, 0.2);
         }
         
         .rank-number {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: var(--accent);
-            min-width: 40px;
+            min-width: 45px;
+            font-family: 'DIN Condensed', 'Arial Black', sans-serif;
         }
         
         .rank-info {
@@ -235,14 +260,15 @@
         
         .rank-percent {
             color: var(--primary);
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 16px;
         }
         
         /* Footer */
         .footer {
             background: var(--bg-card);
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             border: 1px solid var(--border);
             text-align: center;
             color: var(--text-sub);
@@ -252,13 +278,36 @@
         .footer .source {
             color: var(--primary);
         }
+        
+        .team-list {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .team-member {
+            background: rgba(88, 166, 255, 0.15);
+            border: 1px solid var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--primary);
+        }
+        
+        .team-member.leader {
+            background: rgba(247, 147, 26, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Banner Section -->
         <div class="banner">
-            <h1>🚛 <span>4米2轻卡</span>城配业务分布图</h1>
+            <h1>🚛 <span>4米2轻卡</span>城配业务分布图 <span class="version-badge">v2.0</span></h1>
             <div class="metrics">
                 <div class="metric-card">
                     <div class="metric-value">56万+</div>
@@ -281,7 +330,7 @@
         
         <!-- Real Map Section -->
         <div class="map-section">
-            <h2 class="section-title">城市分布地图</h2>
+            <h2 class="section-title">城市分布地图（点击标记查看详情）</h2>
             <div id="map"></div>
             <div class="legend">
                 <div class="legend-item">
@@ -291,6 +340,9 @@
                 <div class="legend-item">
                     <div class="legend-dot blue"></div>
                     <span>其他重点城市</span>
+                </div>
+                <div class="legend-item">
+                    <span style="color: var(--text-sub);">🖱️ 点击标记查看详情</span>
                 </div>
             </div>
         </div>
@@ -302,7 +354,7 @@
                 <div class="rank-card">
                     <div class="rank-number">1</div>
                     <div class="rank-info">
-                        <div class="rank-city">深圳</div>
+                        <div class="rank-city">🏆 深圳</div>
                         <div class="rank-count">55,469辆</div>
                     </div>
                     <div class="rank-percent">26%</div>
@@ -310,7 +362,7 @@
                 <div class="rank-card">
                     <div class="rank-number">2</div>
                     <div class="rank-info">
-                        <div class="rank-city">广州</div>
+                        <div class="rank-city">🥈 广州</div>
                         <div class="rank-count">20,000+辆</div>
                     </div>
                     <div class="rank-percent">9.4%</div>
@@ -318,7 +370,7 @@
                 <div class="rank-card">
                     <div class="rank-number">3</div>
                     <div class="rank-info">
-                        <div class="rank-city">成都</div>
+                        <div class="rank-city">🥉 成都</div>
                         <div class="rank-count">20,000+辆</div>
                     </div>
                     <div class="rank-percent">9.4%</div>
@@ -377,23 +429,32 @@
         <!-- Footer -->
         <div class="footer">
             <p>数据来源：<span class="source">电车资源 / 中汽协</span>，2024年</p>
-            <p style="margin-top: 8px;">🦄 由小马佩德罗 & 小马-艺术家 联合出品</p>
+            <div class="team-list">
+                <span class="team-member leader">🦄 小马佩德罗</span>
+                <span class="team-member">🐴 小马驹</span>
+                <span class="team-member">✨ 小马宝莉</span>
+                <span class="team-member">🎨 小马-艺术家</span>
+                <span class="team-member">🧠 小马牛牛</span>
+            </div>
+            <p style="margin-top: 12px; font-size: 12px;">
+                🤖 多机器人协作成果 · 2026年4月
+            </p>
         </div>
     </div>
     
     <script>
         // Initialize map centered on China
         var map = L.map('map', {
-            center: [30, 105],
+            center: [35, 105],
             zoom: 4,
             minZoom: 3,
-            maxZoom: 10,
+            maxZoom: 8,
             zoomControl: true
         });
         
-        // Add dark theme tile layer (CartoDB Dark Matter)
+        // Add dark theme tile layer (CartoDB Dark Matter) - shows actual map tiles
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd',
             maxZoom: 20
         }).addTo(map);
@@ -411,19 +472,19 @@
             { name: '武汉', count: '10,000+辆', percent: '4.7%', lat: 30.5928, lng: 114.3055, top3: false }
         ];
         
-        // Custom marker icons
+        // Custom marker icons - larger for TOP3
         var orangeIcon = L.divIcon({
             className: 'custom-marker',
-            html: '<div style="width:20px;height:20px;background:#F7931A;border-radius:50%;border:3px solid #fff;box-shadow:0 2px8px rgba(0,0,0,0.3)"></div>',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
+            html: '<div style="width:24px;height:24px;background:#F7931A;border-radius:50%;border:3px solid #fff;box-shadow:0 2px12px rgba(247,147,26,0.5);display:flex;align-items:center;justify-content:center;font-size:10px;">🚛</div>',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
         });
         
         var blueIcon = L.divIcon({
             className: 'custom-marker',
-            html: '<div style="width:16px;height:16px;background:#58A6FF;border-radius:50%;border:2px solid #fff;box-shadow:0 2px6px rgba(0,0,0,0.3)"></div>',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
+            html: '<div style="width:18px;height:18px;background:#58A6FF;border-radius:50%;border:2px solid #fff;box-shadow:0 2px8px rgba(88,166,255,0.4);display:flex;align-items:center;justify-content:center;font-size:8px;">📍</div>',
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
         });
         
         // Add markers for each city
@@ -432,14 +493,27 @@
             var marker = L.marker([city.lat, city.lng], { icon: icon }).addTo(map);
             
             var popupContent = '<div class="popup-content">' +
-                '<h3>' + city.name + '</h3>' +
-                '<p>保有量: ' + city.count + '</p>' +
-                '<p>占比: ' + city.percent + '</p>' +
-                '<p>排名: #' + (index + 1) + '</p>' +
+                '<h3>🚛 ' + city.name + '</h3>' +
+                '<p><span>保有量:</span> <strong>' + city.count + '</strong></p>' +
+                '<p><span>全国占比:</span> <strong>' + city.percent + '</strong></p>' +
+                '<p><span>排名:</span> <strong>#' + (index + 1) + '</strong></p>' +
+                '<p><span>城配业务:</span> <strong>' + (city.top3 ? '🔥 核心' : '📦 重点') + '</strong></p>' +
                 '</div>';
             
             marker.bindPopup(popupContent);
+            
+            // Auto-open popup for TOP3 cities
+            if (city.top3 && index < 1) {
+                setTimeout(function() {
+                    marker.openPopup();
+                }, 500);
+            }
         });
+        
+        // Add province boundaries hint layer (simplified visual)
+        var chinaBounds = [
+            [[18, 73], [53, 135]]
+        ];
     </script>
 </body>
 </html>
